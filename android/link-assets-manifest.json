@@ -1,0 +1,65 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "source/assets/fonts/AbhayaLibre/AbhayaLibre-Bold.ttf",
+      "sha1": "f93fa32a87de489c430b55fbcb4f24bd49880467"
+    },
+    {
+      "path": "source/assets/fonts/AbhayaLibre/AbhayaLibre-ExtraBold.ttf",
+      "sha1": "9d2a7a176ee329a2f2478858843c614cf57a9472"
+    },
+    {
+      "path": "source/assets/fonts/AbhayaLibre/AbhayaLibre-Medium.ttf",
+      "sha1": "6cfa0f3046032771cf84f0c7396513e302f075fb"
+    },
+    {
+      "path": "source/assets/fonts/AbhayaLibre/AbhayaLibre-Regular.ttf",
+      "sha1": "4e41d2773850d3f768979da22d221fc8669c0727"
+    },
+    {
+      "path": "source/assets/fonts/AbhayaLibre/AbhayaLibre-SemiBold.ttf",
+      "sha1": "676210093eae0db23b9b72124545c6372fb0237e"
+    },
+    {
+      "path": "source/assets/fonts/Cairo/Cairo-Black.ttf",
+      "sha1": "51d87902ff56b2e8987f7f06ef49e8d351fe0022"
+    },
+    {
+      "path": "source/assets/fonts/Cairo/Cairo-Bold.ttf",
+      "sha1": "5a7b0543c6c62843900f5d5a049ebc32b5434f5d"
+    },
+    {
+      "path": "source/assets/fonts/Cairo/Cairo-ExtraBold.ttf",
+      "sha1": "2e48992cc4ffd7333cdc9eb4aa2ba883c4c74f1a"
+    },
+    {
+      "path": "source/assets/fonts/Cairo/Cairo-ExtraLight.ttf",
+      "sha1": "b30ddfae52c62b49cb3affd654b097aff5e6e849"
+    },
+    {
+      "path": "source/assets/fonts/Cairo/Cairo-Light.ttf",
+      "sha1": "59aa049d56f70f770af92fd869ee02f6b408e444"
+    },
+    {
+      "path": "source/assets/fonts/Cairo/Cairo-Medium.ttf",
+      "sha1": "fd8e2d03679d461b556bb4cc464811310c12ed24"
+    },
+    {
+      "path": "source/assets/fonts/Cairo/Cairo-Regular.ttf",
+      "sha1": "c40cd69d854d12c818b30c86668a45305b531c5d"
+    },
+    {
+      "path": "source/assets/fonts/Cairo/Cairo-SemiBold.ttf",
+      "sha1": "62ebd95c7f440e03311188c9eed02aae313045c5"
+    },
+    {
+      "path": "source/assets/fonts/ABeeZee/ABeeZee-Italic.ttf",
+      "sha1": "01ee49994920178bf5d94d47e2fba54c32f204fe"
+    },
+    {
+      "path": "source/assets/fonts/ABeeZee/ABeeZee-Regular.ttf",
+      "sha1": "3228dce6045041ccde6ce7a12ebbcc52bbc257bd"
+    }
+  ]
+}
