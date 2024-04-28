@@ -87,7 +87,9 @@ const Onboard: React.FunctionComponent<Props> = ({navigation}) => {
             align={'right'}
           />
         </View>
-        <TouchableOpacity style={[styles.btnContainer]}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate(screens.classification)}
+          style={[styles.btnContainer]}>
           <AppText
             label={en.screens.onboard.start}
             size={'medium'}
@@ -135,7 +137,7 @@ const styles = StyleSheet.create({
   subContainer: {marginTop: hp(1.5), marginBottom: hp(7)},
   btnContainer: {
     flexDirection: 'row',
-    backgroundColor: colors.philippineBronze,
+    backgroundColor: colors.philippineBronzeOP99,
     paddingVertical: hp(1.8),
     borderRadius: wp(5.5),
     justifyContent: 'center',

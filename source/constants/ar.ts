@@ -6,5 +6,6 @@ export default {
       subTitle: 'وجهتك لاستكشاف\nاللغات الأثرية',
       start: 'ابدأ',
     },
+    classification: {title: 'تصنيف\nاللغة'},
   },
 };

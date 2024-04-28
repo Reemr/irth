@@ -6,5 +6,6 @@ export default {
       subTitle: 'Your destination\nto explore ancient languages',
       start: 'Start',
     },
+    classification: {title: 'Language\nClassification'},
   },
 };
