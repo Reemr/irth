@@ -37,7 +37,6 @@ const data = {
 };
 
 const Classification: React.FunctionComponent<Props> = () => {
-  console.log('wp:>>>', Platform.OS, '   ', hp(55));
   return (
     <View style={styles.mainContainer}>
       <Header

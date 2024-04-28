@@ -88,7 +88,7 @@ const Onboard: React.FunctionComponent<Props> = ({navigation}) => {
           />
         </View>
         <TouchableOpacity
-          onPress={() => navigation.navigate(screens.classification)}
+          onPress={() => navigation.navigate(screens.siteMap)}
           style={[styles.btnContainer]}>
           <AppText
             label={en.screens.onboard.start}
