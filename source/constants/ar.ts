@@ -1,0 +1,10 @@
+export default {
+  screens: {
+    onboard: {
+      title: 'تراث يسمو',
+      time: 'للغد',
+      subTitle: 'وجهتك لاستكشاف\nاللغات الأثرية',
+      start: 'ابدأ',
+    },
+  },
+};
