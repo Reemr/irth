@@ -7,5 +7,7 @@ export default {
       start: 'ابدأ',
     },
     classification: {title: 'تصنيف\nاللغة'},
+    gallery: {title: 'معرض\nالصور'},
+    details: {title: 'معرض\nالصور'},
   },
 };

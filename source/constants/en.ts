@@ -7,5 +7,7 @@ export default {
       start: 'Start',
     },
     classification: {title: 'Language\nClassification'},
+    gallery: {title: 'Photo\ngallery'},
+    details: {title: 'Photo\ngallery'},
   },
 };
