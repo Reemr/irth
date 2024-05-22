@@ -46,7 +46,6 @@ const data: GalleryImg[] = [
 ];
 
 const Gallery: React.FunctionComponent<Props> = ({navigation}) => {
-  console.log('wp:>>>', Platform.OS, '   ', wp(28.5));
   const renderItem = ({item}: {item: GalleryImg}) => {
     return (
       <TouchableOpacity onPress={() => navigation.navigate(screens.details)}>

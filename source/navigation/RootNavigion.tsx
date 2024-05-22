@@ -12,7 +12,7 @@ import Details from '../screens/Details';
 export type RootStackParamsList = {
   Onboarding: undefined;
   SiteMap: undefined;
-  Classification: undefined;
+  Classification: {image: any};
   Gallery: undefined;
   Details: undefined;
 };

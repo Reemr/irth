@@ -1,5 +1,5 @@
 import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamsList} from '../navigation/RootNavigion';
 import {screens} from '../constants/screens';
@@ -11,10 +11,17 @@ import {
 } from 'react-native-responsive-screen';
 import colors from '../themes/colors';
 import shadows from '../themes/shadows';
+import SelectImageModal from '../components/SelectImageModal';
 
 type Props = NativeStackScreenProps<RootStackParamsList, screens.siteMap>;
 
 const SiteMap: React.FunctionComponent<Props> = ({navigation}) => {
+  const [isCameraModal, setIsCameraModal] = useState(false);
+
+  const selectImage = (image: any) => {
+    navigation.navigate(screens.classification, {image});
+  };
+
   return (
     <View style={styles.mainContaner}>
       <MapView
@@ -37,20 +44,25 @@ const SiteMap: React.FunctionComponent<Props> = ({navigation}) => {
         />
       </MapView>
       <View style={styles.actionContainer}>
-        <TouchableOpacity style={styles.actionBox}>
-          <Icons.photo height={33} width={33} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate(screens.classification)}
-          style={styles.actionRound}>
-          <Icons.camera height={55} width={55} />
-        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigation.navigate(screens.gallery)}
           style={styles.actionBox}>
+          <Icons.photo height={33} width={33} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setIsCameraModal(true)}
+          style={styles.actionRound}>
+          <Icons.camera height={55} width={55} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionBox}>
           <Icons.menu height={33} width={33} />
         </TouchableOpacity>
       </View>
+      <SelectImageModal
+        isVisible={isCameraModal}
+        onClose={() => setIsCameraModal(false)}
+        onSelect={selectImage}
+      />
     </View>
   );
 };

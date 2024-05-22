@@ -7,5 +7,6 @@ export default {
   philippineBronze: '#6D3905',
   philippineBronzeOP61: '#6D390561',
   lightTaupe: '#A8886980',
+  modalBackground: 'rgba(52,52,52,0.8)',
   transparent: 'transparent',
 };

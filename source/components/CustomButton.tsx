@@ -23,9 +23,16 @@ const CustomButton = ({
   textColor = colors.white,
   containerStyle,
   textStyle,
+  onPress,
 }: Props) => {
   return (
-    <TouchableOpacity style={[styles.container]}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        styles.container,
+        bgColor && {backgroundColor: bgColor},
+        containerStyle && containerStyle,
+      ]}>
       <AppText
         label={title}
         size={'medium'}
@@ -33,6 +40,7 @@ const CustomButton = ({
         color={textColor}
         align="center"
         lineHeight={wp(5.5)}
+        textStyles={textStyle}
       />
     </TouchableOpacity>
   );

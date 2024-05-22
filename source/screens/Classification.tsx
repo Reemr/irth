@@ -36,7 +36,12 @@ const data = {
     'هي لغة سامية شرقية -أوسطية، انطلقت مع قيام الحضارة  الآرامية في وسط سوريا وكانت لغة رسمية في بعض دول العالم القديم',
 };
 
-const Classification: React.FunctionComponent<Props> = () => {
+const Classification: React.FunctionComponent<Props> = ({
+  navigation,
+  route,
+}) => {
+  const {params} = route;
+
   return (
     <View style={styles.mainContainer}>
       <Header
@@ -44,7 +49,11 @@ const Classification: React.FunctionComponent<Props> = () => {
         arTitle={ar.screens.classification.title}
       />
       <Image
-        source={require('../assets/images/artifectFull.png')}
+        source={
+          params?.image?.uri
+            ? {uri: params?.image?.uri}
+            : require('../assets/images/artifectFull.png')
+        }
         style={styles.image}
       />
       <View style={styles.contentContainer}>
