@@ -23,10 +23,16 @@ import {ABeeZee, AbhayaLibre, Ciaro} from '../themes/fonts';
 import colors from '../themes/colors';
 import en from '../constants/en';
 import ar from '../constants/ar';
+import {setStorageValue} from '../utils/storageManager';
+import storageKeys from '../constants/storageKeys';
 
 type Props = NativeStackScreenProps<RootStackParamsList, screens.onboarding>;
 
 const Onboard: React.FunctionComponent<Props> = ({navigation}) => {
+  const onStart = async () => {
+    await setStorageValue(storageKeys.onboardCompleted, true);
+    navigation.replace(screens.siteMap);
+  };
   return (
     <View>
       <StatusBar barStyle={'light-content'} />
@@ -87,9 +93,7 @@ const Onboard: React.FunctionComponent<Props> = ({navigation}) => {
             align={'right'}
           />
         </View>
-        <TouchableOpacity
-          onPress={() => navigation.navigate(screens.siteMap)}
-          style={[styles.btnContainer]}>
+        <TouchableOpacity onPress={onStart} style={[styles.btnContainer]}>
           <AppText
             label={en.screens.onboard.start}
             size={'medium'}

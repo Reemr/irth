@@ -1,5 +1,11 @@
-import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
-import React, {useState} from 'react';
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React, {memo, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamsList} from '../navigation/RootNavigion';
 import {screens} from '../constants/screens';
@@ -22,6 +28,46 @@ const SiteMap: React.FunctionComponent<Props> = ({navigation}) => {
     navigation.navigate(screens.classification, {image});
   };
 
+  const locations = [
+    {
+      id: 0,
+      latitude: 24.774265,
+      longitude: 46.738586,
+      title: 'title 1',
+      description: 'description 1',
+      img: require('../assets/images/galleryImage1.png'),
+    },
+    {
+      id: 1,
+      latitude: 24.764265,
+      longitude: 46.748586,
+      title: 'title 2',
+      description: 'description 2',
+      img: require('../assets/images/galleryImage2.png'),
+    },
+    {
+      id: 2,
+      latitude: 24.784265,
+      longitude: 46.748586,
+      title: 'title 3',
+      description: 'description 3',
+      img: require('../assets/images/galleryImage3.png'),
+    },
+  ];
+
+  const Markers = memo(() => {
+    return locations?.map(item => (
+      <Marker
+        tracksViewChanges={false}
+        key={item?.id}
+        coordinate={{latitude: item?.latitude, longitude: item?.longitude}}
+        title={item?.title}
+        description={item?.description}>
+        <Image source={item?.img} style={styles.marker} />
+      </Marker>
+    ));
+  });
+
   return (
     <View style={styles.mainContaner}>
       <MapView
@@ -33,15 +79,7 @@ const SiteMap: React.FunctionComponent<Props> = ({navigation}) => {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}>
-        <Marker
-          coordinate={{
-            latitude: 24.774265,
-            longitude: 46.738586,
-          }}
-          image={require('../assets/images/galleryImage1.png')}
-          title={'Test'}
-          description={'test desctiption'}
-        />
+        <Markers />
       </MapView>
       <View style={styles.actionContainer}>
         <TouchableOpacity
@@ -96,4 +134,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...shadows.primary,
   },
+  marker: {width: wp(12), height: wp(12), resizeMode: 'contain'},
 });
