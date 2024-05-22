@@ -10,4 +10,5 @@ export default {
     gallery: {title: 'Photo\ngallery'},
     details: {title: 'Photo\ngallery'},
   },
+  errors: {storageError: 'Something wrong with local storage'},
 };
