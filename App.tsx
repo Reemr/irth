@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import RootNavigion from './source/navigation/RootNavigion';
-import {ActivityIndicator, StatusBar} from 'react-native';
+import {StatusBar} from 'react-native';
 import colors from './source/themes/colors';
 import {getStorageValue} from './source/utils/storageManager';
 import storageKeys from './source/constants/storageKeys';
 import Loader from './source/components/Loader';
+import {Provider} from 'react-redux';
+import store from './source/redux/store';
 
 const App = () => {
   const [isOnboardCompleted, setIsOnboardCompleted] = useState(false);
@@ -23,7 +25,7 @@ const App = () => {
   }, []);
 
   return (
-    <>
+    <Provider store={store}>
       <StatusBar
         backgroundColor={colors.transparent}
         translucent={true}
@@ -34,7 +36,7 @@ const App = () => {
       ) : (
         <Loader bgColor={colors.white} loaderColor={colors.black} />
       )}
-    </>
+    </Provider>
   );
 };
 

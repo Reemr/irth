@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   Platform,
   ScrollView,
@@ -6,7 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamsList} from '../navigation/RootNavigion';
 import {screens} from '../constants/screens';
@@ -21,6 +22,13 @@ import {
 } from 'react-native-responsive-screen';
 import AppText from '../components/AppText';
 import {AbhayaLibre} from '../themes/fonts';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../redux/store';
+import {
+  clearGetArtifactDetails,
+  getArtifactDetailsAction,
+} from '../redux/slices/getArtifactDetails';
+import Loader from '../components/Loader';
 
 type Props = NativeStackScreenProps<RootStackParamsList, screens.details>;
 
@@ -33,7 +41,27 @@ const data = {
     'مسلة عليها كتابة بالخط الأرامي، حوالي القرن الخامس- الرابع قبل الميلاد، قصر الحمراء تيماء - تبوك',
 };
 
-const Details: React.FunctionComponent<Props> = () => {
+const Details: React.FunctionComponent<Props> = ({route}) => {
+  const {params} = route;
+
+  const dispatch = useDispatch<AppDispatch>();
+  const artifactDetails = useSelector(
+    (state: RootState) => state.getArtifactDetails,
+  );
+
+  useEffect(() => {
+    if (params?.detailId) {
+      dispatch(getArtifactDetailsAction(params?.detailId));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (artifactDetails?.error) {
+      Alert.alert(artifactDetails?.error);
+      dispatch(clearGetArtifactDetails());
+    }
+  }, [artifactDetails]);
+
   return (
     <View style={styles.mainContainer}>
       <Header
@@ -41,13 +69,13 @@ const Details: React.FunctionComponent<Props> = () => {
         arTitle={ar.screens.details.title}
       />
       <Image
-        source={require('../assets/images/artifectFull.png')}
+        source={{uri: artifactDetails?.data?.image}}
         style={styles.image}
       />
       <View style={styles.contentContainer}>
         <View style={[styles.content, styles.titleContainer]}>
           <AppText
-            label={data.enTitle}
+            label={artifactDetails?.data?.engTitle || ''}
             size={'extraLarge'}
             fontFamily={AbhayaLibre.extraBold}
             lineHeight={wp(7)}
@@ -55,25 +83,25 @@ const Details: React.FunctionComponent<Props> = () => {
             textStyles={styles.flex1}
           />
           <AppText
-            label={data.arTitle}
+            label={artifactDetails?.data?.arTitle || ''}
             size={'extraLarge'}
             fontFamily={AbhayaLibre.extraBold}
             lineHeight={wp(9)}
             color={colors.philippineBronze}
-            textStyles={[styles.flex1, styles.arTitle]}
+            textStyles={styles.flex1}
             align={'right'}
           />
         </View>
         <View style={styles.content}>
           <AppText
-            label={data.enDiscription}
+            label={artifactDetails?.data?.engDescription || ''}
             size={'small'}
             fontFamily={AbhayaLibre.extraBold}
             color={colors.philippineBronze}
             textStyles={styles.flex1}
           />
           <AppText
-            label={data.arDiscription}
+            label={artifactDetails?.data?.arDescription || ''}
             size={'small'}
             fontFamily={AbhayaLibre.extraBold}
             color={colors.philippineBronze}
@@ -82,6 +110,7 @@ const Details: React.FunctionComponent<Props> = () => {
           />
         </View>
       </View>
+      {artifactDetails?.isLoading && <Loader />}
     </View>
   );
 };
@@ -108,7 +137,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
   },
   content: {flexDirection: 'row', justifyContent: 'space-between'},
-  // arTitle: {paddingTop: hp(1)},
   flex1: {flex: 1},
   titleContainer: {paddingTop: hp(3.5), paddingBottom: hp(1)},
 });

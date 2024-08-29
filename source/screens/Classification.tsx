@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   Platform,
   ScrollView,
@@ -6,7 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamsList} from '../navigation/RootNavigion';
 import {screens} from '../constants/screens';
@@ -21,6 +22,12 @@ import {
 } from 'react-native-responsive-screen';
 import AppText from '../components/AppText';
 import {AbhayaLibre} from '../themes/fonts';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../redux/store';
+import {
+  clearUploadArtifactDetails,
+  uploadArtifactDetailsAction,
+} from '../redux/slices/uploadArtifactDetails';
 
 type Props = NativeStackScreenProps<
   RootStackParamsList,
@@ -41,6 +48,23 @@ const Classification: React.FunctionComponent<Props> = ({
   route,
 }) => {
   const {params} = route;
+  const dispatch = useDispatch<AppDispatch>();
+  const artifactDetails = useSelector(
+    (state: RootState) => state.uploadArtifactDetails,
+  );
+
+  useEffect(() => {
+    console.log('params?.image:>>>>', params?.image);
+    const _data = {image: params?.image, content: data};
+    // dispatch(uploadArtifactDetailsAction(_data));
+  }, []);
+
+  useEffect(() => {
+    if (artifactDetails?.error) {
+      Alert.alert(artifactDetails?.error);
+      dispatch(clearUploadArtifactDetails());
+    }
+  }, [artifactDetails]);
 
   return (
     <View style={styles.mainContainer}>

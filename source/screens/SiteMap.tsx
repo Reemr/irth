@@ -1,11 +1,12 @@
 import {
+  Alert,
   Image,
   Platform,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {memo, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamsList} from '../navigation/RootNavigion';
 import {screens} from '../constants/screens';
@@ -18,55 +19,64 @@ import {
 import colors from '../themes/colors';
 import shadows from '../themes/shadows';
 import SelectImageModal from '../components/SelectImageModal';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../redux/store';
+import {
+  clearGetLocations,
+  getLocationsAction,
+} from '../redux/slices/getLocations';
+import Loader from '../components/Loader';
+import AppText from '../components/AppText';
+import {AbhayaLibre, Ciaro} from '../themes/fonts';
+import {getVertexTokenAction} from '../redux/slices/getVertexToken';
 
 type Props = NativeStackScreenProps<RootStackParamsList, screens.siteMap>;
 
 const SiteMap: React.FunctionComponent<Props> = ({navigation}) => {
   const [isCameraModal, setIsCameraModal] = useState(false);
 
+  const dispatch = useDispatch<AppDispatch>();
+  const locationsRes = useSelector((state: RootState) => state.getLocations);
+  const vertexToken = useSelector((state: RootState) => state.getVertexToken);
+
   const selectImage = (image: any) => {
+    console.log('image:>>>', image);
+
     navigation.navigate(screens.classification, {image});
   };
 
-  const locations = [
-    {
-      id: 0,
-      latitude: 24.774265,
-      longitude: 46.738586,
-      title: 'title 1',
-      description: 'description 1',
-      img: require('../assets/images/galleryImage1.png'),
-    },
-    {
-      id: 1,
-      latitude: 24.764265,
-      longitude: 46.748586,
-      title: 'title 2',
-      description: 'description 2',
-      img: require('../assets/images/galleryImage2.png'),
-    },
-    {
-      id: 2,
-      latitude: 24.784265,
-      longitude: 46.748586,
-      title: 'title 3',
-      description: 'description 3',
-      img: require('../assets/images/galleryImage3.png'),
-    },
-  ];
-
   const Markers = memo(() => {
-    return locations?.map(item => (
+    return locationsRes?.data?.map(item => (
       <Marker
         tracksViewChanges={false}
         key={item?.id}
         coordinate={{latitude: item?.latitude, longitude: item?.longitude}}
         title={item?.title}
         description={item?.description}>
-        <Image source={item?.img} style={styles.marker} />
+        <View>
+          <AppText
+            label={item?.totalArtifacts?.toString()}
+            fontFamily={Ciaro.medium}
+            color={colors.white}
+            textStyles={styles.totalArtifacts}
+          />
+          <Image source={{uri: item?.image}} style={styles.marker} />
+        </View>
       </Marker>
     ));
   });
+
+  useEffect(() => {
+    dispatch(getLocationsAction());
+    dispatch(getVertexTokenAction());
+  }, []);
+
+  useEffect(() => {
+    if (locationsRes?.error) {
+      Alert.alert(locationsRes?.error);
+      dispatch(clearGetLocations());
+    }
+  }, [locationsRes]);
 
   return (
     <View style={styles.mainContaner}>
@@ -75,11 +85,11 @@ const SiteMap: React.FunctionComponent<Props> = ({navigation}) => {
         provider="google"
         initialRegion={{
           latitude: 24.774265,
-          longitude: 46.738586,
+          longitude: 46.73858,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}>
-        <Markers />
+        {locationsRes?.data && locationsRes?.data?.length > 0 && <Markers />}
       </MapView>
       <View style={styles.actionContainer}>
         <TouchableOpacity
@@ -101,6 +111,7 @@ const SiteMap: React.FunctionComponent<Props> = ({navigation}) => {
         onClose={() => setIsCameraModal(false)}
         onSelect={selectImage}
       />
+      {locationsRes?.isLoading && <Loader />}
     </View>
   );
 };
@@ -134,5 +145,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...shadows.primary,
   },
-  marker: {width: wp(12), height: wp(12), resizeMode: 'contain'},
+  marker: {width: wp(14), height: wp(14), resizeMode: 'contain'},
+  totalArtifacts: {
+    backgroundColor: colors.philippineBronze,
+    paddingHorizontal: wp(2),
+    lineHeight: hp(3),
+    borderRadius: wp(5),
+    alignSelf: 'baseline',
+    marginBottom: hp(-1.5),
+    zIndex: 2,
+  },
 });

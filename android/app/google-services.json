@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "941320012034",
+    "project_id": "irth-410112",
+    "storage_bucket": "irth-410112.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:941320012034:android:1977620a0d29b2efba421b",
+        "android_client_info": {
+          "package_name": "com.irth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6SGOrU_Jzmwa1pxiUuYGZ2Kh1ft8G4_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

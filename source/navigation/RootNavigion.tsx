@@ -13,7 +13,7 @@ export type RootStackParamsList = {
   SiteMap: undefined;
   Classification: {image: any};
   Gallery: undefined;
-  Details: undefined;
+  Details: {detailId: string};
 };
 
 type Props = {isOnboardCompleted: boolean};

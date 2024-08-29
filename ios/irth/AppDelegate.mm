@@ -2,6 +2,7 @@
 
 #import <React/RCTBundleURLProvider.h>
 #import <GoogleMaps/GoogleMaps.h>
+#import <Firebase.h>
 
 @implementation AppDelegate
 
@@ -11,6 +12,7 @@
   self.moduleName = @"irth";
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
+  [FIRApp configure];
   self.initialProps = @{};
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];

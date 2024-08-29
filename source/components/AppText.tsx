@@ -1,4 +1,4 @@
-import {Text} from 'react-native';
+import {Text, TextStyle} from 'react-native';
 import React from 'react';
 import colors from '../themes/colors';
 import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
@@ -9,7 +9,7 @@ type Props = {
   size?: string;
   align?: string;
   underline?: boolean;
-  textStyles?: any;
+  textStyles?: TextStyle | TextStyle[];
   opacity?: number;
   lines?: number;
   fontFamily?: string;
