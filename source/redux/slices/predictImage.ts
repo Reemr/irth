@@ -10,10 +10,21 @@ import apiRoutes from '../../constants/apiRoutes';
 
 export const predictImageAction = createAsyncThunk(
   'predictImage',
-  async (requestData, {rejectWithValue}) => {
+  async (requestData: any, {rejectWithValue}) => {
     try {
-      const res: ApiResponse = await axios.post(apiRoutes.predict, requestData);
+      const res: ApiResponse = await axios.post(
+        apiRoutes.predict,
+        requestData?.data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${requestData?.token}`,
+          },
+        },
+      );
       const data: any = await res?.data;
+      console.log('predict data:>>>>>', data);
+
       if (data?.status == 'error') {
         throw data;
       } else {
@@ -21,6 +32,8 @@ export const predictImageAction = createAsyncThunk(
       }
     } catch (error: any) {
       const err = error?.response?.data || error;
+      console.log('error:>>>>', error);
+
       return rejectWithValue(err);
     }
   },

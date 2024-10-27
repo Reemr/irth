@@ -29,6 +29,10 @@ import Loader from '../components/Loader';
 import AppText from '../components/AppText';
 import {AbhayaLibre, Ciaro} from '../themes/fonts';
 import {getVertexTokenAction} from '../redux/slices/getVertexToken';
+import {
+  clearPredictImage,
+  predictImageAction,
+} from '../redux/slices/predictImage';
 
 type Props = NativeStackScreenProps<RootStackParamsList, screens.siteMap>;
 
@@ -38,11 +42,39 @@ const SiteMap: React.FunctionComponent<Props> = ({navigation}) => {
   const dispatch = useDispatch<AppDispatch>();
   const locationsRes = useSelector((state: RootState) => state.getLocations);
   const vertexToken = useSelector((state: RootState) => state.getVertexToken);
+  const predictImageResponse = useSelector(
+    (state: RootState) => state.predictImage,
+  );
 
   const selectImage = (image: any) => {
-    console.log('image:>>>', image);
+    // console.log('image:>>>', image);
+    if (image?.uri && vertexToken?.data?.token) {
+      // Create a FormData object to hold the image file
+      // const formData = new FormData();
+      // formData.append('instances', [
+      //   {
+      //     uri: image?.uri, // Image file URI
+      //     type: 'image/jpeg', // Image MIME type (adjust as needed)
+      //     name: image?.name, // Name of the uploaded file
+      //   },
+      // ]);
+      // data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII
+      const base64Image =
+        'iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII';
+      const imageData = {
+        instances: [
+          {
+            instance_key_1: base64Image,
+          },
+        ],
+      };
+      const data = {token: vertexToken?.data?.token, data: imageData};
+      console.log('req data:>>>>>>>', data);
 
-    navigation.navigate(screens.classification, {image});
+      dispatch(predictImageAction(data));
+    }
+
+    // navigation.navigate(screens.classification, {image});
   };
 
   const Markers = memo(() => {
@@ -75,6 +107,16 @@ const SiteMap: React.FunctionComponent<Props> = ({navigation}) => {
     if (locationsRes?.error) {
       Alert.alert(locationsRes?.error);
       dispatch(clearGetLocations());
+    }
+  }, [locationsRes]);
+
+  useEffect(() => {
+    if (predictImageResponse?.data) {
+      console.log('predictImageResponse?.data:>>>', predictImageResponse?.data);
+    }
+    if (predictImageResponse?.error) {
+      Alert.alert(predictImageResponse?.error);
+      dispatch(clearPredictImage());
     }
   }, [locationsRes]);
 

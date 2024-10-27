@@ -47,7 +47,6 @@ const getJWT = (payload: any, private_key: string) => {
 
     // Construct the complete JWT
     const jwt = `${signatureBase}.${base64urlSignature}`;
-    console.log('jwt:>>>', jwt);
 
     return jwt;
   } catch (error) {

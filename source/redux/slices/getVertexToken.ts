@@ -12,11 +12,11 @@ import apiRoutes, {
 } from '../../constants/apiRoutes';
 import getJWT from '../../utils/createJWT';
 
-const SERVICE_ACCOUNT_KEY = require('../../constants/irth-410112-7390c1107e8d.json');
+const SERVICE_ACCOUNT_KEY = require('../../constants/irth-410112-599f207d6d91.json');
 
 export const getVertexTokenAction = createAsyncThunk(
   'getVertexToken',
-  async (requestData, {rejectWithValue}) => {
+  async (_, {rejectWithValue}) => {
     try {
       const {client_email, private_key} = SERVICE_ACCOUNT_KEY;
       // Payload for the JWT
@@ -44,6 +44,8 @@ export const getVertexTokenAction = createAsyncThunk(
       }
     } catch (error: any) {
       const err = error?.response?.data || error;
+      console.log('error token:>>>>>>', err);
+
       return rejectWithValue(err);
     }
   },
