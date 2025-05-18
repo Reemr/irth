@@ -1,3 +1,4 @@
+import React, {useEffect, useState} from 'react';
 import {
   Alert,
   Image,
@@ -6,8 +7,8 @@ import {
   StyleSheet,
   Text,
   View,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useEffect} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamsList} from '../navigation/RootNavigion';
 import {screens} from '../constants/screens';
@@ -29,11 +30,16 @@ import {
   uploadArtifactDetailsAction,
 } from '../redux/slices/uploadArtifactDetails';
 
+import {predictArtifact, Prediction} from '../utils/inference';
+import Svg, {Rect} from 'react-native-svg';
+
+// Type for navigation props
 type Props = NativeStackScreenProps<
   RootStackParamsList,
   screens.classification
 >;
 
+// Static content
 const data = {
   enTitle: 'Aramaic language',
   enDiscription:
@@ -43,16 +49,22 @@ const data = {
     'هي لغة سامية شرقية -أوسطية، انطلقت مع قيام الحضارة  الآرامية في وسط سوريا وكانت لغة رسمية في بعض دول العالم القديم',
 };
 
-const Classification: React.FunctionComponent<Props> = ({
-  navigation,
-  route,
-}) => {
+const Classification: React.FC<Props> = ({navigation, route}) => {
   const {params} = route;
   const dispatch = useDispatch<AppDispatch>();
   const artifactDetails = useSelector(
     (state: RootState) => state.uploadArtifactDetails,
   );
 
+  // ▶ AI inference state
+  const [photoUri, setPhotoUri] = useState<string | undefined>(
+    params?.image?.uri,
+  );
+  const [prediction, setPrediction] = useState<Prediction | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | undefined>();
+
+  // Existing effects
   useEffect(() => {
     console.log('params?.image:>>>>', params?.image);
     const _data = {image: params?.image, content: data};
@@ -61,25 +73,101 @@ const Classification: React.FunctionComponent<Props> = ({
 
   useEffect(() => {
     if (artifactDetails?.error) {
-      Alert.alert(artifactDetails?.error);
+      Alert.alert(artifactDetails.error);
       dispatch(clearUploadArtifactDetails());
     }
   }, [artifactDetails]);
 
+  // ▶ Run inference when image param changes
+  useEffect(() => {
+    if (params?.image?.uri) {
+      analyzeImage(
+        params.image.uri,
+        params.image.fileName ?? 'photo.jpg',
+        params.image.type ?? 'image/jpeg',
+      );
+    }
+  }, [params?.image?.uri]);
+
+  // ▶ Function to call inference API
+  const analyzeImage = async (
+    uri: string,
+    fileName: string,
+    mimeType: string,
+  ) => {
+    setError(undefined);
+    setPrediction(null);
+    setLoading(true);
+    try {
+      const result = await predictArtifact(uri, fileName, mimeType);
+      setPrediction(result);
+      setPhotoUri(uri);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <View style={styles.mainContainer}>
+    <ScrollView
+      contentContainerStyle={{flexGrow: 1}}
+      style={styles.mainContainer}
+    >
       <Header
         enTitle={en.screens.classification.title}
         arTitle={ar.screens.classification.title}
       />
-      <Image
-        source={
-          params?.image?.uri
-            ? {uri: params?.image?.uri}
-            : require('../assets/images/artifectFull.png')
-        }
-        style={styles.image}
-      />
+
+      {/* Image & overlays container */}
+      <View style={{position: 'relative', marginVertical: hp(2)}}>
+        <Image
+          source={
+            photoUri
+              ? {uri: photoUri}
+              : require('../assets/images/artifectFull.png')
+          }
+          style={styles.image}
+        />
+
+        {/* ▶ Loading spinner */}
+        {loading && (
+          <ActivityIndicator
+            style={StyleSheet.absoluteFill}
+            size="large"
+          />
+        )}
+
+        {/* ▶ Bounding-box overlays */}
+        {prediction?.boxes.map((box, i) => {
+          const [x1, y1, x2, y2] = box;
+          return (
+            <Svg key={i} style={StyleSheet.absoluteFill}>
+              <Rect
+                x={x1}
+                y={y1}
+                width={x2 - x1}
+                height={y2 - y1}
+                stroke="red"
+                strokeWidth={2}
+                fill="transparent"
+              />
+            </Svg>
+          );
+        })}
+      </View>
+
+      {/* ▶ Error message */}
+      {error && (
+        <AppText
+          label={error}
+          size="small"
+          color="red"
+          textStyles={{marginTop: hp(1)}}
+        />
+      )}
+
+      {/* Existing content below image */}
       <View style={styles.contentContainer}>
         <View style={[styles.content, styles.titleContainer]}>
           <AppText
@@ -118,7 +206,7 @@ const Classification: React.FunctionComponent<Props> = ({
           />
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -134,7 +222,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: hp(55),
     borderRadius: wp(9.5),
-    marginVertical: hp(2),
   },
   contentContainer: {
     flex: 1,

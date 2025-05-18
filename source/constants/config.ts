@@ -1,1 +1,1 @@
-export default {ENDPOINT_ID: '2755404726508978176', PROJECT_ID: '941320012034'};
+export const INFERENCE_SERVICE_BASE_URL = "https://yolo-inference-service-941320012034.us-central1.run.app";

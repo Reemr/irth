@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Button,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -21,16 +22,19 @@ import colors from '../themes/colors';
 import en from '../constants/en';
 import ar from '../constants/ar';
 import Header from '../components/Header';
-import firestore from '@react-native-firebase/firestore';
+import {launchImageLibrary, launchCamera, Asset} from 'react-native-image-picker';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../redux/store';
 import {clearGetGallery, getGalleryAction} from '../redux/slices/getGallery';
 import {Gallery as GalleryData} from '../types/collectionTypes';
 import Loader from '../components/Loader';
 
-type Props = NativeStackScreenProps<RootStackParamsList, screens.gallery>;
+type Props = NativeStackScreenProps<
+  RootStackParamsList,
+  screens.gallery
+>;
 
-const Gallery: React.FunctionComponent<Props> = ({navigation}) => {
+const Gallery: React.FC<Props> = ({navigation}) => {
   const dispatch = useDispatch<AppDispatch>();
   const galleryData = useSelector((state: RootState) => state.getGallery);
 
@@ -40,27 +44,63 @@ const Gallery: React.FunctionComponent<Props> = ({navigation}) => {
 
   useEffect(() => {
     if (galleryData?.error) {
-      Alert.alert(galleryData?.error);
+      Alert.alert(galleryData.error);
       dispatch(clearGetGallery());
     }
   }, [galleryData]);
 
-  const renderItem = ({item}: {item: GalleryData}) => {
-    return (
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate(screens.details, {detailId: item?.detailId})
-        }>
-        <Image source={{uri: item?.image}} style={styles.image} />
-      </TouchableOpacity>
-    );
+  // Launch image library picker
+  const pickAndClassify = () => {
+    launchImageLibrary({mediaType: 'photo'}, resp => {
+      if (resp.didCancel || !resp.assets?.length) return;
+      const asset: Asset = resp.assets[0];
+      navigation.navigate(screens.classification, {
+        image: {
+          uri: asset.uri!,
+          fileName: asset.fileName ?? 'photo.jpg',
+          type: asset.type ?? 'image/jpeg',
+        },
+      });
+    });
   };
+
+  // Launch camera to capture photo
+  const captureAndClassify = () => {
+    launchCamera({mediaType: 'photo', saveToPhotos: true}, resp => {
+      if (resp.didCancel || !resp.assets?.length) return;
+      const asset: Asset = resp.assets[0];
+      navigation.navigate(screens.classification, {
+        image: {
+          uri: asset.uri!,
+          fileName: asset.fileName ?? 'photo.jpg',
+          type: asset.type ?? 'image/jpeg',
+        },
+      });
+    });
+  };
+
+  const renderItem = ({item}: {item: GalleryData}) => (
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate(screens.details, {detailId: item.detailId})
+      }>
+      <Image source={{uri: item.image}} style={styles.image} />
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.mainContainer}>
       <Header
         enTitle={en.screens.gallery.title}
         arTitle={ar.screens.gallery.title}
       />
+
+      {/* Pick from library */}
+      <Button title="Pick & Classify" onPress={pickAndClassify} />
+
+      {/* Capture from camera */}
+      <Button title="Capture & Classify" onPress={captureAndClassify} />
+
       <FlatList
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
@@ -68,8 +108,9 @@ const Gallery: React.FunctionComponent<Props> = ({navigation}) => {
         renderItem={renderItem}
         numColumns={3}
         columnWrapperStyle={styles.columnWrapper}
-        ItemSeparatorComponent={() => <View style={styles.seprator} />}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
+
       {galleryData?.isLoading && <Loader />}
     </View>
   );
@@ -84,7 +125,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {paddingVertical: hp(2), alignSelf: 'center'},
-  image: {height: wp(28.5), width: wp(28.5), borderRadius: wp(9.5)},
+  image: {
+    height: wp(28.5),
+    width: wp(28.5),
+    borderRadius: wp(9.5),
+  },
   columnWrapper: {gap: wp(2)},
-  seprator: {height: hp(1.5)},
+  separator: {height: hp(1.5)},
 });

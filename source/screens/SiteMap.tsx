@@ -28,97 +28,65 @@ import {
 import Loader from '../components/Loader';
 import AppText from '../components/AppText';
 import {AbhayaLibre, Ciaro} from '../themes/fonts';
-import {getVertexTokenAction} from '../redux/slices/getVertexToken';
-import {
-  clearPredictImage,
-  predictImageAction,
-} from '../redux/slices/predictImage';
+
+// 1. Import Asset for typing
+import { Asset } from 'react-native-image-picker';
 
 type Props = NativeStackScreenProps<RootStackParamsList, screens.siteMap>;
 
-const SiteMap: React.FunctionComponent<Props> = ({navigation}) => {
+const SiteMap: React.FC<Props> = ({navigation}) => {
   const [isCameraModal, setIsCameraModal] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
   const locationsRes = useSelector((state: RootState) => state.getLocations);
-  const vertexToken = useSelector((state: RootState) => state.getVertexToken);
-  const predictImageResponse = useSelector(
-    (state: RootState) => state.predictImage,
-  );
-
-  const selectImage = (image: any) => {
-    // console.log('image:>>>', image);
-    if (image?.uri && vertexToken?.data?.token) {
-      // Create a FormData object to hold the image file
-      // const formData = new FormData();
-      // formData.append('instances', [
-      //   {
-      //     uri: image?.uri, // Image file URI
-      //     type: 'image/jpeg', // Image MIME type (adjust as needed)
-      //     name: image?.name, // Name of the uploaded file
-      //   },
-      // ]);
-      // data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII
-      const base64Image =
-        'iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII';
-      const imageData = {
-        instances: [
-          {
-            instance_key_1: base64Image,
-          },
-        ],
-      };
-      const data = {token: vertexToken?.data?.token, data: imageData};
-      console.log('req data:>>>>>>>', data);
-
-      dispatch(predictImageAction(data));
-    }
-
-    // navigation.navigate(screens.classification, {image});
-  };
-
-  const Markers = memo(() => {
-    return locationsRes?.data?.map(item => (
-      <Marker
-        tracksViewChanges={false}
-        key={item?.id}
-        coordinate={{latitude: item?.latitude, longitude: item?.longitude}}
-        title={item?.title}
-        description={item?.description}>
-        <View>
-          <AppText
-            label={item?.totalArtifacts?.toString()}
-            fontFamily={Ciaro.medium}
-            color={colors.white}
-            textStyles={styles.totalArtifacts}
-          />
-          <Image source={{uri: item?.image}} style={styles.marker} />
-        </View>
-      </Marker>
-    ));
-  });
 
   useEffect(() => {
     dispatch(getLocationsAction());
-    dispatch(getVertexTokenAction());
   }, []);
 
   useEffect(() => {
     if (locationsRes?.error) {
-      Alert.alert(locationsRes?.error);
+      Alert.alert(locationsRes.error);
       dispatch(clearGetLocations());
     }
   }, [locationsRes]);
 
-  useEffect(() => {
-    if (predictImageResponse?.data) {
-      console.log('predictImageResponse?.data:>>>', predictImageResponse?.data);
-    }
-    if (predictImageResponse?.error) {
-      Alert.alert(predictImageResponse?.error);
-      dispatch(clearPredictImage());
-    }
-  }, [locationsRes]);
+  // 2. Updated selectImage: navigate to Classification instead of dispatching
+  const selectImage = (image: Asset) => {
+    // Close the modal
+    setIsCameraModal(false);
+
+    // Navigate to Classification screen
+    navigation.navigate(screens.classification, {
+      image: {
+        uri: image.uri!,
+        fileName: image.fileName ?? 'photo.jpg',
+        type: image.type ?? 'image/jpeg',
+      },
+    });
+  };
+
+  const Markers = memo(() =>
+    locationsRes.data?.map(item => (
+      <Marker
+        tracksViewChanges={false}
+        key={item.id}
+        coordinate={{latitude: item.latitude, longitude: item.longitude}}
+        title={item.title}
+        description={item.description}>
+        <View>
+          <AppText
+            label={item.totalArtifacts?.toString() ?? ''}
+            fontFamily={Ciaro.medium}
+            color={colors.white}
+            textStyles={styles.totalArtifacts}
+          />
+          <Image source={{uri: item.image}} style={styles.marker} />
+        </View>
+      </Marker>
+    )),
+  );
+
 
   return (
     <View style={styles.mainContaner}>
@@ -131,34 +99,44 @@ const SiteMap: React.FunctionComponent<Props> = ({navigation}) => {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}>
-        {locationsRes?.data && locationsRes?.data?.length > 0 && <Markers />}
+        {(locationsRes.data?.length ?? 0) > 0 && <Markers />}
       </MapView>
+
       <View style={styles.actionContainer}>
+        {/* Gallery button */}
         <TouchableOpacity
           onPress={() => navigation.navigate(screens.gallery)}
           style={styles.actionBox}>
           <Icons.photo height={33} width={33} />
         </TouchableOpacity>
+
+        {/* Camera modal button */}
         <TouchableOpacity
           onPress={() => setIsCameraModal(true)}
           style={styles.actionRound}>
           <Icons.camera height={55} width={55} />
         </TouchableOpacity>
+
+        {/* (Other menu button) */}
         <TouchableOpacity style={styles.actionBox}>
           <Icons.menu height={33} width={33} />
         </TouchableOpacity>
       </View>
+
+      {/* 3. Show your custom modal that calls selectImage on pick/capture */}
       <SelectImageModal
         isVisible={isCameraModal}
         onClose={() => setIsCameraModal(false)}
         onSelect={selectImage}
       />
-      {locationsRes?.isLoading && <Loader />}
+
+      {locationsRes.isLoading && <Loader />}
     </View>
   );
 };
 
 export default SiteMap;
+
 const styles = StyleSheet.create({
   mainContaner: {flex: 1},
   map: {...StyleSheet.absoluteFillObject},

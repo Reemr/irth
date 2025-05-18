@@ -27,6 +27,7 @@
     "react-native": "0.74.0",
     "react-native-base64": "^0.2.1",
     "react-native-image-crop-picker": "^0.41.1",
+    "react-native-image-picker": "^8.2.1",
     "react-native-jwt": "^1.0.0",
     "react-native-maps": "^1.14.0",
     "react-native-quick-crypto": "^0.7.3",

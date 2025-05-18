@@ -4,67 +4,64 @@ import {
   createAsyncThunk,
   createSlice,
 } from '@reduxjs/toolkit';
-import axios from 'axios';
-import {ApiInitialState, ApiResponse} from '../../types/apiTypes';
-import apiRoutes from '../../constants/apiRoutes';
+import { predictArtifact, Prediction } from '../../utils/inference';
 
-export const predictImageAction = createAsyncThunk(
-  'predictImage',
-  async (requestData: any, {rejectWithValue}) => {
-    try {
-      const res: ApiResponse = await axios.post(
-        apiRoutes.predict,
-        requestData?.data,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${requestData?.token}`,
-          },
-        },
-      );
-      const data: any = await res?.data;
-      console.log('predict data:>>>>>', data);
+// Define the slice state for predictions
+interface PredictState {
+  isLoading: boolean;
+  data: Prediction | null;
+  error: string | null;
+}
 
-      if (data?.status == 'error') {
-        throw data;
-      } else {
-        return data;
-      }
-    } catch (error: any) {
-      const err = error?.response?.data || error;
-      console.log('error:>>>>', error);
-
-      return rejectWithValue(err);
-    }
-  },
-);
-
-const initialState: ApiInitialState = {
+// Initial state
+const initialState: PredictState = {
   isLoading: false,
   data: null,
   error: null,
 };
 
-export const clearPredictImage = createAction('CLEAR_ALL');
+// Action to clear the prediction state
+export const clearPredictImage = createAction('predictImage/clear');
 
+// Async thunk for calling the inference service
+export const predictImageAction = createAsyncThunk<
+  Prediction,                                     // Return type
+  { uri: string; fileName: string; mimeType: string }, // Thunk arg type
+  { rejectValue: string }                          // rejectWithValue type
+>(
+  'predictImage',
+  async ({ uri, fileName, mimeType }, { rejectWithValue }) => {
+    try {
+      const result = await predictArtifact(uri, fileName, mimeType);
+      return result;
+    } catch (err: any) {
+      // Return only the error message string for serializability
+      return rejectWithValue(err.message || 'Inference failed');
+    }
+  }
+);
+
+// Slice
 const predictImageSlice = createSlice({
-  name: 'predictImageSlice',
+  name: 'predictImage',
   initialState,
   reducers: {},
   extraReducers: builder => {
     builder.addCase(predictImageAction.pending, state => {
       state.isLoading = true;
+      state.error = null;
     });
     builder.addCase(
       predictImageAction.fulfilled,
-      (state, action: PayloadAction<any>) => {
+      (state, action: PayloadAction<Prediction>) => {
         state.isLoading = false;
         state.data = action.payload;
-      },
+        state.error = null;
+      }
     );
     builder.addCase(predictImageAction.rejected, (state, action) => {
       state.isLoading = false;
-      state.error = action.payload;
+      state.error = action.payload ?? action.error.message ?? 'Unexpected error';
     });
     builder.addCase(clearPredictImage, () => initialState);
   },

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Button,
 } from 'react-native';
 import React, {useEffect} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -29,49 +30,82 @@ import {
   getArtifactDetailsAction,
 } from '../redux/slices/getArtifactDetails';
 import Loader from '../components/Loader';
+import {launchImageLibrary, launchCamera, Asset} from 'react-native-image-picker';
 
-type Props = NativeStackScreenProps<RootStackParamsList, screens.details>;
+type Props = NativeStackScreenProps<
+  RootStackParamsList,
+  screens.details
+>;
 
-const data = {
-  enTitle: 'English',
-  enDiscription:
-    'A stela engraved with Aramic script dated 5th - 4th century BCE, Al-Hamra palace, Tayma, Tabuk',
-  arTitle: 'عربي',
-  arDiscription:
-    'مسلة عليها كتابة بالخط الأرامي، حوالي القرن الخامس- الرابع قبل الميلاد، قصر الحمراء تيماء - تبوك',
-};
-
-const Details: React.FunctionComponent<Props> = ({route}) => {
-  const {params} = route;
-
+const Details: React.FC<Props> = ({navigation, route}) => {
+  const {detailId} = route.params;
   const dispatch = useDispatch<AppDispatch>();
   const artifactDetails = useSelector(
     (state: RootState) => state.getArtifactDetails,
   );
 
   useEffect(() => {
-    if (params?.detailId) {
-      dispatch(getArtifactDetailsAction(params?.detailId));
+    if (detailId) {
+      dispatch(getArtifactDetailsAction(detailId));
     }
-  }, []);
+  }, [detailId]);
 
   useEffect(() => {
     if (artifactDetails?.error) {
-      Alert.alert(artifactDetails?.error);
+      Alert.alert(artifactDetails.error);
       dispatch(clearGetArtifactDetails());
     }
   }, [artifactDetails]);
 
+  // Launch image library picker
+  const pickAndClassify = () => {
+    launchImageLibrary({mediaType: 'photo'}, resp => {
+      if (resp.didCancel || !resp.assets?.length) return;
+      const asset: Asset = resp.assets[0];
+      navigation.navigate(screens.classification, {
+        image: {
+          uri: asset.uri!,
+          fileName: asset.fileName ?? 'photo.jpg',
+          type: asset.type ?? 'image/jpeg',
+        },
+      });
+    });
+  };
+
+  // Launch camera to capture photo
+  const captureAndClassify = () => {
+    launchCamera({mediaType: 'photo', saveToPhotos: true}, resp => {
+      if (resp.didCancel || !resp.assets?.length) return;
+      const asset: Asset = resp.assets[0];
+      navigation.navigate(screens.classification, {
+        image: {
+          uri: asset.uri!,
+          fileName: asset.fileName ?? 'photo.jpg',
+          type: asset.type ?? 'image/jpeg',
+        },
+      });
+    });
+  };
+
   return (
-    <View style={styles.mainContainer}>
+    <ScrollView
+      contentContainerStyle={{flexGrow: 1}}
+      style={styles.mainContainer}
+    >
       <Header
         enTitle={en.screens.details.title}
         arTitle={ar.screens.details.title}
       />
+
+      {/* Buttons for picking or capturing */}
+      <Button title="Pick & Classify" onPress={pickAndClassify} />
+      <Button title="Capture & Classify" onPress={captureAndClassify} />
+
       <Image
         source={{uri: artifactDetails?.data?.image}}
         style={styles.image}
       />
+
       <View style={styles.contentContainer}>
         <View style={[styles.content, styles.titleContainer]}>
           <AppText
@@ -110,8 +144,9 @@ const Details: React.FunctionComponent<Props> = ({route}) => {
           />
         </View>
       </View>
+
       {artifactDetails?.isLoading && <Loader />}
-    </View>
+    </ScrollView>
   );
 };
 
