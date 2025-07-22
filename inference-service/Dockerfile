@@ -3,7 +3,7 @@ FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
 
 USER root
 
-# Install GLib, OpenGL, and X-libs
+# 1) Install system‐level libs for GLib, OpenGL, etc.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     libgl1-mesa-glx \
@@ -14,13 +14,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# 1. Copy & install your Python deps
+# 2) Install Python deps
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 2. Copy your code + weights
-COPY main.py . 
-COPY best.pt .
+# 3) Copy in your entire application
+COPY app/ ./app/
 
-# (tiangolo’s image will read APP_MODULE or default to main:app)
-ENV APP_MODULE=main:app
+# 4) Tiangolo which module to load
+ENV APP_MODULE=app.main:app

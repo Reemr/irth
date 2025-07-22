@@ -25,7 +25,17 @@ CREATE TABLE detections (
   created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE classifications (
+  id           SERIAL PRIMARY KEY,
+  image_id     INTEGER NOT NULL REFERENCES images(image_id) ON DELETE CASCADE,
+  class_id     INTEGER NOT NULL,
+  confidence   REAL    NOT NULL,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- 4) Indexes for fast querying
 CREATE INDEX ON images(timestamp);
 CREATE INDEX ON detections(image_id);
 CREATE INDEX ON detections(class_id);
+CREATE INDEX ON classifications(image_id);
+CREATE INDEX ON classifications(class_id);

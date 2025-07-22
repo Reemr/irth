@@ -1,4 +1,20 @@
+# Web framework
 fastapi
 uvicorn[standard]
+
+# YOLO model
 ultralytics
-pillow
+
+# Image + array processing
+numpy
+Pillow
+
+# Cloud Storage client
+google-cloud-storage
+
+# Database ORM + Postgres driver
+SQLAlchemy
+pg8000
+
+# Settings / env
+pydantic
